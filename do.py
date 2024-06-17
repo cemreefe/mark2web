@@ -4,7 +4,14 @@ import yaml
 import json
 from datetime import datetime
 import frontmatter
+import markdown
+import shutil
+from jinja2 import Environment, PackageLoader, select_autoescape
 
+env = Environment(
+    loader=PackageLoader("do"),
+    autoescape=select_autoescape()
+)
 class Config:
 
     class Group:
@@ -13,7 +20,8 @@ class Config:
 
         def __init__(self, name, template, path_config, rss):
             self.name = name
-            self.template = template
+            self.template_ = template
+            self.template = env.get_template(template)
             self.path_config = path_config
             self.rss = rss
             Config.Group.INSTANCES[name] = self
@@ -60,6 +68,7 @@ class Parser:
         self.config = None
 
     def prepare_out_dir(self):
+        shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir, exist_ok=True)
 
     def parse_config(self):
@@ -79,11 +88,14 @@ class Parser:
             post = frontmatter.load(f)
             meta = post.metadata
             content = post.content
+            content_html = markdown.markdown(content)  # Render the markdown content to HTML
+            
             return {
-                'file_path': file_path,
                 'meta': meta,
                 'content': content,
+                'content_html': content_html
             }
+
 
     @classmethod
     def get_parser(cls, extension):
@@ -97,31 +109,53 @@ class Parser:
         for root, _, files in os.walk(self.src_dir):
             for file in files:
                 file_path = os.path.join(root, file)
+                file_relpath = os.path.relpath(file_path, start=self.src_dir)
                 extension = Parser.get_file_extension(file_path)
                 path_without_extension = Parser.get_filepath_without_extension(file_path)
                 if extension not in self.EXTENSIONS_WHITELIST:
                     continue
                 _parser = Parser.get_parser(extension)
+                print("_parser:", _parser(file_path))
                 self.dictionary[file_path] = {
-                    **_parser(file_path),
                     'extension': extension,
-                    'path_without_extension': path_without_extension
+                    'out_extension': 'html',
+                    'file_path': file_path,
+                    'file_relpath': file_relpath,
+                    'file_relpath_without_extension': path_without_extension,
+                    **_parser(file_path),
                 }
 
-    def make_paths(self):
+    def resolve_groups(self):
         for file_path in self.dictionary:
             group_name = self.dictionary[file_path]['meta']['group']
             group = Config.Group.get_group_by_name(group_name)
-            path = group.make_path_for_file(self.dictionary[file_path])
+            self.dictionary[file_path]['group'] = group
+
+    def make_paths(self):
+        for file_path, context in self.dictionary.items():
+            path = context['group'].make_path_for_file(self.dictionary[file_path])
             self.dictionary[file_path]['calculated_uri'] = path
+
+    def write(self):
+        for _, context in self.dictionary.items():
+            uri_slash_filename = context['calculated_uri'].lstrip('/')
+            uri_slash_filename = uri_slash_filename + "." + context['out_extension'] if uri_slash_filename else 'index.html'
+            out_path = os.path.join(self.out_dir, uri_slash_filename).rstrip('/')
+            os.makedirs(os.path.dirname(out_path), exist_ok=True)
+            with open(out_path, 'w') as f:
+                render = context['group'].template.render(context=context)
+                f.write(render)
 
     def make(self):
         self.parse_config()
         self.prepare_out_dir()
         self.parse_directory()
+        self.resolve_groups()
         self.make_paths()
 
         print(json.dumps(self.dictionary, indent=2, default=str))
+
+        self.write()
 
     
     def process_groups():

@@ -7,8 +7,6 @@ groups:
     path_config:
       - "\"p\""
       - "['meta']['date'].year"
-      - "['meta']['date'].month"
-      - "['meta']['date'].day"
       - "['meta']['handle']"
   - name: generic
     template: generic.html

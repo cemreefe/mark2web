@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ context.title }}{% endblock %}
+{% block content %}
+    <h1>{{ context.title }}</h1>
+    <p class="important">
+     This is a generic page.
+    </p>
+    {{ context.content_html|safe }}
+{% endblock %}

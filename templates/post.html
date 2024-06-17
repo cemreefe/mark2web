@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Post: {{ context.title }}{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1>Post: {{ context.title }}</h1>
+    <p class="important">
+     This is a post.
+    </p>
+    {{ context.content_html|safe }}
+{% endblock %}
