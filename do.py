@@ -39,7 +39,7 @@ class GroupConfig:
                 parts.append(str(eval(field)))
             else:
                 parts.append(str(eval(f'info{field}')))
-        path_str = '/'.join(parts)
+        path_str = '/' + '/'.join(parts)
         path_str = re.sub(r'/+', '/', path_str)
         return path_str
 
@@ -130,6 +130,7 @@ def write_files(file_contexts: List[FileContext], out_dir: str):
 
 
 def generate_rss(file_contexts: List[FileContext], out_dir: str, site_url: str):
+    site_url = site_url.rstrip('/')
     group_names_with_rss = {fc.group.name for fc in file_contexts if fc.group and fc.group.rss}
     group_contexts = [fc for fc in file_contexts if fc.group and fc.group.name in group_names_with_rss]
     if not group_contexts:
@@ -157,7 +158,7 @@ def parse_directory(src_dir: str, whitelist: List[str]) -> List[FileContext]:
                 out_extension='html',
                 file_path=file_path,
                 file_relpath=file_relpath,
-                file_relpath_without_extension=get_filepath_without_extension(file_path),
+                file_relpath_without_extension=get_filepath_without_extension(file_relpath),
                 **parsed_data
             ))
     return file_contexts

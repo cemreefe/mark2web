@@ -52,7 +52,7 @@ groups:
     template: generic.html
     rss: false
     path_config:
-      - "['meta']['canonical-url']"
+      - "['meta']['canonical-uri']"
 ```
 
 ## Usage

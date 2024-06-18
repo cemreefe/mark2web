@@ -7,7 +7,7 @@
     {% for context in file_contexts %}
     <item>
       <title>{{ context.meta.title }}</title>
-      <link>{{ site_url }}/{{ context.calculated_uri }}</link>
+      <link>{{ site_url }}{{ context.calculated_uri }}</link>
       <pubDate>{{ context.meta.date.strftime('%a, %d %b %Y %H:%M:%S %z') }}</pubDate>
       <description><![CDATA[{{ context.content_html }}]]></description>
     </item>

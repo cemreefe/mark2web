@@ -3,7 +3,7 @@ date: 2024-06-03
 title: Homepage
 group: Generic
 handle: /
-canonical-url: /
+canonical-uri: /
 redirect-here: 
     - /main
     - /home
