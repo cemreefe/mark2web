@@ -13,6 +13,7 @@ from typing import List, Dict, Any, Optional
 
 # Define a constant for default template directory
 DEFAULT_TEMPLATE_DIR = 'templates'  # Adjust to your default template directory path
+MARKDOWN_EXTENSIONS = ['tables', 'toc']
 
 # Setting up Jinja2 environment
 def setup_jinja_env(template_dir):
@@ -82,7 +83,7 @@ def get_filepath_without_extension(file_path: str) -> str:
 def parse_markdown(file_path: str) -> Dict[str, Any]:
     with open(file_path, 'r', encoding='utf-8') as f:
         post = frontmatter.load(f)
-        content_html = markdown.markdown(post.content)
+        content_html = markdown.markdown(post.content, extensions=MARKDOWN_EXTENSIONS)
         return {
             'meta': post.metadata,
             'content': post.content,
