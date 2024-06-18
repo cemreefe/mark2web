@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>{{ group.name }} RSS Feed</title>
+    <link>{{ site_url }}</link>
+    <description>{{ group.name }} updates</description>
+    {% for context in file_contexts %}
+    <item>
+      <title>{{ context.meta.title }}</title>
+      <link>{{ site_url }}/{{ context.calculated_uri }}</link>
+      <pubDate>{{ context.meta.date.strftime('%a, %d %b %Y %H:%M:%S %z') }}</pubDate>
+      <description><![CDATA[{{ context.content_html }}]]></description>
+    </item>
+    {% endfor %}
+  </channel>
+</rss>

@@ -1,7 +1,7 @@
 ---
 date: 2024-06-03
 title: Homepage
-group: generic
+group: Generic
 handle: /
 canonical-url: /
 redirect-here: 

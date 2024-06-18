@@ -3,6 +3,7 @@ import re
 import yaml
 import json
 from datetime import datetime
+import argparse
 import frontmatter
 import markdown
 import shutil
@@ -123,6 +124,19 @@ def write_files(file_contexts: List[FileContext], out_dir: str):
             f.write(render)
 
 
+def generate_rss(file_contexts: List[FileContext], out_dir: str, site_url: str):
+    group_names_with_rss = {fc.group.name for fc in file_contexts if fc.group and fc.group.rss}
+    group_contexts = [fc for fc in file_contexts if fc.group and fc.group.name in group_names_with_rss]
+    if not group_contexts:
+        return
+    rss_template = env.get_template('rss.xml.j2')
+    rss_content = rss_template.render(group=group_contexts[0].group, file_contexts=group_contexts, site_url=site_url)
+    rss_path = os.path.join(out_dir, "rss.xml")
+    with open(rss_path, 'w', encoding='utf-8') as rss_file:
+        rss_file.write(rss_content)
+
+
+
 def parse_directory(src_dir: str, whitelist: List[str]) -> List[FileContext]:
     file_contexts = []
     for root, _, files in os.walk(src_dir):
@@ -144,7 +158,7 @@ def parse_directory(src_dir: str, whitelist: List[str]) -> List[FileContext]:
     return file_contexts
 
 
-def main(src_dir: str, out_dir: str, config_path: str):
+def main(src_dir: str, out_dir: str, config_path: str, site_url: str):
     config = parse_config(config_path)
     prepare_out_dir(out_dir)
     file_contexts = parse_directory(src_dir, ['md'])
@@ -152,11 +166,16 @@ def main(src_dir: str, out_dir: str, config_path: str):
     file_contexts = make_paths(file_contexts)
     print(json.dumps([asdict(context) for context in file_contexts], indent=2, default=str))
     write_files(file_contexts, out_dir)
+    generate_rss(file_contexts, out_dir, site_url)
 
 
-# Example usage
-main(
-    src_dir='test_folder',
-    out_dir='test_output',
-    config_path='config.yaml'
-)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process some files.')
+    parser.add_argument('--src_dir', type=str, required=True, help='Source directory containing markdown files')
+    parser.add_argument('--out_dir', type=str, required=True, help='Output directory for generated files')
+    parser.add_argument('--config_path', type=str, required=False, default='config.yaml', help='Path to configuration YAML file')
+    parser.add_argument('--site_url', type=str, required=True, help='Base URL of the site')
+    
+    args = parser.parse_args()
+    
+    main(src_dir=args.src_dir, out_dir=args.out_dir, config_path=args.config_path, site_url=args.site_url)

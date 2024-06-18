@@ -1,6 +1,6 @@
 ---
 date: 2020-01-01
-group: post
+group: Posts
 title: Cats!
 handle: cats
 ---
