@@ -1,6 +1,6 @@
 ---
 date: 2024-06-03
-title: This is a title
+title: Homepage
 group: generic
 handle: /
 canonical-url: /

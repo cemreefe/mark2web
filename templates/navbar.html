@@ -1,0 +1,6 @@
+<ul>
+    <p></p>This is the navbar:</p>
+    {% for context_item in all %}
+    <li><a href='{{ context_item.calculated_uri }}'>{{ context_item.meta.title }}</a></li>
+    {% endfor %}
+</ul>

@@ -1,7 +1,7 @@
 ---
 date: 2020-01-01
 group: post
-title: This is a title
+title: Cats!
 handle: cats
 ---
 
