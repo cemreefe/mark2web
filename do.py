@@ -7,15 +7,20 @@ import argparse
 import frontmatter
 import markdown
 import shutil
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from dataclasses import dataclass, field, asdict, replace
 from typing import List, Dict, Any, Optional
 
+# Define a constant for default template directory
+DEFAULT_TEMPLATE_DIR = 'templates'  # Adjust to your default template directory path
+
 # Setting up Jinja2 environment
-env = Environment(
-    loader=PackageLoader("do"),
-    autoescape=select_autoescape()
-)
+def setup_jinja_env(template_dir):
+    env = Environment(
+        loader=FileSystemLoader(template_dir),
+        autoescape=select_autoescape()
+    )
+    return env
 
 @dataclass(frozen=True)
 class GroupConfig:
@@ -24,7 +29,7 @@ class GroupConfig:
     path_config: List[str]
     rss: Any
 
-    def get_template(self):
+    def get_template(self, env):
         return env.get_template(self.template)
 
     def make_path_for_file(self, info: Dict[str, Any]) -> str:
@@ -120,7 +125,7 @@ def write_files(file_contexts: List[FileContext], out_dir: str):
         out_path = os.path.join(out_dir, uri_slash_filename).rstrip('/')
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         with open(out_path, 'w') as f:
-            render = context.group.get_template().render(context=asdict(context), all=context_dicts)
+            render = context.group.get_template(env).render(context=asdict(context), all=context_dicts)
             f.write(render)
 
 
@@ -158,7 +163,10 @@ def parse_directory(src_dir: str, whitelist: List[str]) -> List[FileContext]:
     return file_contexts
 
 
-def main(src_dir: str, out_dir: str, config_path: str, site_url: str):
+def main(src_dir: str, out_dir: str, config_path: str, site_url: str, template_dir: str):
+    global env
+    env = setup_jinja_env(template_dir)
+    
     config = parse_config(config_path)
     prepare_out_dir(out_dir)
     file_contexts = parse_directory(src_dir, ['md'])
@@ -175,7 +183,8 @@ if __name__ == "__main__":
     parser.add_argument('--out_dir', type=str, required=True, help='Output directory for generated files')
     parser.add_argument('--config_path', type=str, required=False, default='config.yaml', help='Path to configuration YAML file')
     parser.add_argument('--site_url', type=str, required=True, help='Base URL of the site')
+    parser.add_argument('--template_dir', type=str, required=False, default=DEFAULT_TEMPLATE_DIR, help='Path to directory containing Jinja templates')
     
     args = parser.parse_args()
     
-    main(src_dir=args.src_dir, out_dir=args.out_dir, config_path=args.config_path, site_url=args.site_url)
+    main(src_dir=args.src_dir, out_dir=args.out_dir, config_path=args.config_path, site_url=args.site_url, template_dir=args.template_dir)
