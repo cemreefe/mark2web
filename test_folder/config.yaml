@@ -1,15 +1,20 @@
 formats:
   meta.date: '%Y-%m-%d'
 groups:
-  - name: Posts
+  - name: posts
     template: post.html
     rss: true
     path_config:
       - "\"p\""
       - "['meta']['date'].year"
       - "['meta']['handle']"
-  - name: Generic
+  - name: generic
     template: generic.html
+    rss: false
+    path_config:
+      - "['meta']['canonical-uri']"
+  - name: blog
+    template: blog.html
     rss: false
     path_config:
       - "['meta']['canonical-uri']"

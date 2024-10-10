@@ -1,6 +1,7 @@
-<ul>
-    <p></p>This is the navbar:</p>
-    {% for context_item in all %}
-    <li><a href='{{ context_item.calculated_uri }}'>{{ context_item.meta.title }}</a></li>
-    {% endfor %}
-</ul>
+<h1>The Amazing Website</h1>
+
+{% for _context in all %}
+{% if _context.meta.navbar %}
+- <a href='{{ _context.calculated_uri }}'>{{ _context.meta.title }}</a></li> &nbsp;
+{% endif %}
+{% endfor %}

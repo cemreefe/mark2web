@@ -35,14 +35,23 @@ class GroupConfig:
 
     def make_path_for_file(self, info: Dict[str, Any]) -> str:
         parts = []
-        for field in self.path_config:
-            if field.startswith("\"") and field.endswith("\""):
-                parts.append(str(eval(field)))
-            else:
-                parts.append(str(eval(f'info{field}')))
+        for field_level in self.path_config:
+            fields_in_level = field_level.split("+")
+            resolved_fields_in_level = map(lambda f: GroupConfig._resolve_path_field(f, info), fields_in_level)
+            resolved_level = "".join(resolved_fields_in_level)
+            parts.append(resolved_level)
         path_str = '/' + '/'.join(parts)
         path_str = re.sub(r'/+', '/', path_str)
+        # TODO: Remove.
+        if len(path_str)>1: 
+            path_str += '.html'
         return path_str
+
+    def _resolve_path_field(field: str, info: Dict[str, Any]):
+        if field.startswith("\"") and field.endswith("\""):
+            return str(eval(field))
+        else:
+            return str(eval(f'info{field}'))
 
 
 @dataclass(frozen=True)
@@ -68,6 +77,7 @@ class FileContext:
     meta: Dict[str, Any]
     content: str
     content_html: str
+    preview_html: str
     group: Optional[GroupConfig] = field(default=None, repr=False)
     calculated_uri: str = ''
 
@@ -83,12 +93,19 @@ def get_filepath_without_extension(file_path: str) -> str:
 def parse_markdown(file_path: str) -> Dict[str, Any]:
     with open(file_path, 'r', encoding='utf-8') as f:
         post = frontmatter.load(f)
+        preview_content = post_to_preview_md(post.content)
         content_html = markdown.markdown(post.content, extensions=MARKDOWN_EXTENSIONS)
+        preview_html = markdown.markdown(preview_content, extensions=MARKDOWN_EXTENSIONS)
         return {
             'meta': post.metadata,
             'content': post.content,
-            'content_html': content_html
+            'content_html': content_html,
+            'preview_html': preview_html,
         }
+
+def post_to_preview_md(md: str):
+    preview_content = re.sub("# ", "## ", md)
+    return preview_content
 
 
 def parse_config(path: str) -> Config:
@@ -123,6 +140,8 @@ def write_files(file_contexts: List[FileContext], out_dir: str):
             uri_slash_filename = 'index.html'
         else:
             uri_slash_filename += f".{context.out_extension}"
+        # TODO: Remove.
+        uri_slash_filename = re.sub("(\.html)+", ".html", uri_slash_filename)
         out_path = os.path.join(out_dir, uri_slash_filename).rstrip('/')
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         with open(out_path, 'w') as f:
@@ -144,14 +163,14 @@ def generate_rss(file_contexts: List[FileContext], out_dir: str, site_url: str):
 
 
 
-def parse_directory(src_dir: str, whitelist: List[str]) -> List[FileContext]:
+def parse_directory(src_dir: str, ext_whitelist: List[str]) -> List[FileContext]:
     file_contexts = []
     for root, _, files in os.walk(src_dir):
         for file in files:
             file_path = os.path.join(root, file)
             file_relpath = os.path.relpath(file_path, start=src_dir)
             extension = get_file_extension(file_path)
-            if extension not in whitelist:
+            if extension not in ext_whitelist:
                 continue
             parsed_data = parse_markdown(file_path)
             file_contexts.append(FileContext(
@@ -165,10 +184,11 @@ def parse_directory(src_dir: str, whitelist: List[str]) -> List[FileContext]:
     return file_contexts
 
 
-def main(src_dir: str, out_dir: str, config_path: str, site_url: str, template_dir: str):
+def main(src_dir: str, out_dir: str, config_relpath: str, site_url: str, template_dir: str):
     global env
     env = setup_jinja_env(template_dir)
     
+    config_path = os.path.join(src_dir, config_relpath)
     config = parse_config(config_path)
     prepare_out_dir(out_dir)
     file_contexts = parse_directory(src_dir, ['md'])
@@ -183,10 +203,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some files.')
     parser.add_argument('--src_dir', type=str, required=True, help='Source directory containing markdown files')
     parser.add_argument('--out_dir', type=str, required=True, help='Output directory for generated files')
-    parser.add_argument('--config_path', type=str, required=False, default='config.yaml', help='Path to configuration YAML file')
+    parser.add_argument('--config_relpath', type=str, required=False, default='config.yaml', help='Path to configuration YAML file')
     parser.add_argument('--site_url', type=str, required=True, help='Base URL of the site')
     parser.add_argument('--template_dir', type=str, required=False, default=DEFAULT_TEMPLATE_DIR, help='Path to directory containing Jinja templates')
     
     args = parser.parse_args()
     
-    main(src_dir=args.src_dir, out_dir=args.out_dir, config_path=args.config_path, site_url=args.site_url, template_dir=args.template_dir)
+    main(src_dir=args.src_dir, out_dir=args.out_dir, config_relpath=args.config_relpath, site_url=args.site_url, template_dir=args.template_dir)

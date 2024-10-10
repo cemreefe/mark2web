@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ context.meta.title }}{% endblock %}
+{% block content %}
+    {{ context.content_html|safe }}
+    {% for _context in all %}
+        {% if _context.group.name == "posts" %}
+        <div>
+            <a href="{{ _context.calculated_uri }}">
+                <h2>{{_context.meta.title }}</h2>
+            </a>
+            <p>{{ _context.preview_html|safe }}</p>
+        </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
