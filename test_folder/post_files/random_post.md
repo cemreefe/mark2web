@@ -3,6 +3,9 @@ date: 2023-02-03
 group: posts
 title: Trains I've heard of em
 handle: trains
+tags:
+    - trains
+    - pictures
 ---
 
 ![A train on some landscape](https://images.squarespace-cdn.com/content/v1/588bac14b8a79b68ecd587fd/1548380830317-YZ5YEMOM44Y04XTB3948/Tangula+Long+Shot.jpg?format=2500w)

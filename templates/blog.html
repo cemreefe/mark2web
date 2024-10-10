@@ -8,6 +8,7 @@
             <a href="{{ _context.calculated_uri }}">
                 <h2>{{_context.meta.title }}</h2>
             </a>
+            <small>{{ _context.meta.date }}{% for tag in _context.meta.tags %} - {{tag}}{% endfor %}</small>
             <p>{{ _context.preview_html|safe }}</p>
         </div>
         {% endif %}
