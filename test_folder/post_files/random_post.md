@@ -5,7 +5,7 @@ title: Trains I've heard of em
 handle: trains
 ---
 
-![A train on some landscape](https://www.elskopscholz.com/most-magnificent-train)
+![A train on some landscape](https://images.squarespace-cdn.com/content/v1/588bac14b8a79b68ecd587fd/1548380830317-YZ5YEMOM44Y04XTB3948/Tangula+Long+Shot.jpg?format=2500w)
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sit amet nunc id dolor facilisis lacinia. Vivamus pharetra rhoncus nisl, a rhoncus libero tempor in. Duis pulvinar a felis in gravida. Nam at risus tortor. Phasellus gravida porttitor ex, at lobortis augue iaculis a. Nam nunc nisi, semper in mi eu, semper placerat magna. Donec lacus dui, aliquet eu bibendum suscipit, pretium quis massa.
 

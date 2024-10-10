@@ -2,6 +2,6 @@
 
 {% for _context in all %}
 {% if _context.meta.navbar %}
-- <a href='{{ _context.calculated_uri }}'>{{ _context.meta.title }}</a></li> &nbsp;
+<a href='{{ _context.calculated_uri }}'>{{ _context.meta.title }}</a> &nbsp;
 {% endif %}
 {% endfor %}

@@ -5,21 +5,81 @@
     <link rel="stylesheet" href="style.css" />
     <title>About - Example Website</title>
     
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        a {
+            color:#8f9846;
+        }
+
+        #navbar {
+            color:#cea146;
+            background-color: #333;
+            padding: 10px;
+        }
+
+        #navbar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 20px;
+            background-color: #82a0c0;
+            border: 1px solid #4c5250;
+            margin-right: 5px;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        #content {
+            padding: 20px;
+            max-width: 1000px;
+            text-align: justify;
+        }
+
+        #content * {
+            max-width:inherit;
+        }
+
+        #footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 12px;
+        }
+
+        #footer a {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        #footer a:hover {
+            color: #ccc;
+        }
+    </style>
 </head>
 <body>
     <div id="navbar"><h1>The Amazing Website</h1>
 
 
 
-- <a href='/about.html'>About</a></li> &nbsp;
+<a href='/about.html'>About</a> &nbsp;
 
 
 
-- <a href='/blog.html'>Blog</a></li> &nbsp;
+<a href='/blog.html'>Blog</a> &nbsp;
 
 
 
-- <a href='/'>Homepage</a></li> &nbsp;
+<a href='/'>Homepage</a> &nbsp;
 
 
 
