@@ -94,6 +94,11 @@ groups:
     ```sh
     python3 do.py --src_dir test_folder --out_dir test_output --site_url https://example.com/
     ```
+4. Set up a mock server to test the outputs
+
+    ```sh
+    cd test_output && python3 -m http.server
+    ```
 
 ## Contributing
 
