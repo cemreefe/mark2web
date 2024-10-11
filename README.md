@@ -92,7 +92,7 @@ groups:
 3. Run the  script with the source directory, output directory, and configuration file:
 
     ```sh
-    python do.py
+    python3 do.py --src_dir test_folder --out_dir test_output --site_url https://example.com/
     ```
 
 ## Contributing
