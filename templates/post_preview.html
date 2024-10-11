@@ -1,0 +1,11 @@
+<!-- var: post_context -->
+<div class="post_preview {{ " ".join(post_context.meta.tags) }}">
+    <a href="{{ post_context.calculated_uri }}">
+        <h2>{{ post_context.meta.title }}</h2>
+    </a>
+    <span class="date">{{ post_context.meta.date.strftime('%d %B, %Y') }}</span>
+    {% with tags=post_context.meta.tags %}
+    {% include "tags.html" %}
+    {% endwith %}
+    <p>{{ post_context.preview_html|safe }}</p>
+</div>

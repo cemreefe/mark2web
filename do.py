@@ -134,6 +134,7 @@ def make_paths(file_contexts: List[FileContext]) -> List[FileContext]:
 
 def write_files(file_contexts: List[FileContext], out_dir: str):
     context_dicts = [asdict(context_item) for context_item in file_contexts]
+    tags = [item for list_ in [context_item.meta.get("tags", []) for context_item in file_contexts] for item in list_]
     for context in file_contexts:
         uri_slash_filename = context.calculated_uri.lstrip('/')
         if not uri_slash_filename:
@@ -145,7 +146,7 @@ def write_files(file_contexts: List[FileContext], out_dir: str):
         out_path = os.path.join(out_dir, uri_slash_filename).rstrip('/')
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         with open(out_path, 'w') as f:
-            render = context.group.get_template(env).render(context=asdict(context), all=context_dicts)
+            render = context.group.get_template(env).render(context=asdict(context), all=context_dicts, tags=tags)
             f.write(render)
 
 

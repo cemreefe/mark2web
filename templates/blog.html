@@ -4,16 +4,9 @@
     {{ context.content_html|safe }}
     {% for _context in all %}
         {% if _context.group.name == "posts" %}
-        <div>
-            <a href="{{ _context.calculated_uri }}">
-                <h2>{{_context.meta.title }}</h2>
-            </a>
-            <span class="date">{{ _context.meta.date.strftime('%d %B, %Y') }}</span>
-            {% with tags=_context.meta.tags %}
-            {% include "tags.html" %}
-            {% endwith %}
-            <p>{{ _context.preview_html|safe }}</p>
-        </div>
+        {% with post_context=_context %}
+            {% include "post_preview.html" %}
+        {% endwith %}
         {% endif %}
     {% endfor %}
 {% endblock %}
