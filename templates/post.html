@@ -7,9 +7,17 @@
     </style>
 {% endblock %}
 {% block content %}
-    <h1>Post: {{ context.meta.title }}</h1>
-    <p class="important">
-        ----------------------------------------
-    </p>
+
+    <h1>{{ context.meta.title }}</h1>
+
+    {{ context.meta.date.strftime('%d %B, %Y') }}
+
+    <br><br>
+
+    {% with tags=context.meta.tags %}
+    {% include "tags.html" %}
+    {% endwith %}
+
     {{ context.content_html|safe }}
+
 {% endblock %}
