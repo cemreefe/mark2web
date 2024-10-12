@@ -5,6 +5,7 @@ group: blog
 handle: blog
 canonical-uri: blog
 navbar: true
+reference: blog
 ---
 
 # Blog posts

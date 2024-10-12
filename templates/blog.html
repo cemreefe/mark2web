@@ -9,4 +9,26 @@
         {% endwith %}
         {% endif %}
     {% endfor %}
+    <script type="text/javascript">
+        function filterPosts() {
+          // Get query parameters from the URL
+          var urlParams = new URLSearchParams(window.location.search);
+          var filter = urlParams.get('filter'); // Get the 'filter' parameter
+
+          if (!filter) return;
+    
+          // Get all elements with class 'post_preview'
+          var previews = document.getElementsByClassName('post_preview');
+          
+          // Loop through each post_preview and hide those that don't match the filter
+          for (var i = 0; i < previews.length; i++) {
+            if (filter && !previews[i].classList.contains(filter)) {
+              previews[i].style.display = 'none'; // Hide elements that don't match the filter
+            } else {
+              previews[i].style.display = 'block'; // Ensure elements that match are visible
+            }
+          }
+        }
+        filterPosts();
+    </script>
 {% endblock %}

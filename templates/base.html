@@ -3,7 +3,8 @@
 <head>
     {% block head %}
     <link rel="stylesheet" href="style.css" />
-    <title>{% block title %}{% endblock %} - Example Website</title>
+    <title>{% block title %}{% endblock %} - {{ config.title }}</title>
+    <link rel="icon" type="image/png" href="{{ config.favicon }}">
     {% endblock %}
     <style>
         /* General Styles */
@@ -16,6 +17,11 @@
 
         a {
             color:#1779ba;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
         }
 
         #navbar {

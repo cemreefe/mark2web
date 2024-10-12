@@ -1,3 +1,6 @@
+title: Example Website
+favicon: 
+  emoji: ⚓
 formats:
   meta.date: '%Y-%m-%d'
 groups:

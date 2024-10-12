@@ -10,6 +10,7 @@ import shutil
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from dataclasses import dataclass, field, asdict, replace
 from typing import List, Dict, Any, Optional
+from operator import attrgetter 
 
 # Define a constant for default template directory
 DEFAULT_TEMPLATE_DIR = 'templates'  # Adjust to your default template directory path
@@ -58,13 +59,23 @@ class GroupConfig:
 class Config:
     formats: Dict[str, Any]
     groups: List[GroupConfig]
+    title: str
+    favicon: str
 
     @classmethod
     def load_from_yaml(cls, path: str) -> 'Config':
         with open(path, 'r') as f:
             y = yaml.safe_load(f)
             groups = [GroupConfig(**gc) for gc in y['groups']]
-            return cls(formats=y['formats'], groups=groups)
+            formats = y['formats']
+            title = y["title"]
+            # TODO: Add file / url support.
+            print("ZOR", y)
+            if favicon_emoji := y["favicon"].get("emoji", None):
+                favicon = f"https://emoji.dutl.uk/png/128x128/{favicon_emoji}.png"
+            else:
+                favicon = ""
+            return cls(formats=formats, groups=groups, title=title, favicon=favicon)
 
 
 @dataclass(frozen=True)
@@ -105,6 +116,7 @@ def parse_markdown(file_path: str) -> Dict[str, Any]:
 
 def post_to_preview_md(md: str):
     preview_content = re.sub("# ", "## ", md)
+    preview_content = "\n\n".join(preview_content.split("\n\n")[:10])
     return preview_content
 
 
@@ -132,9 +144,13 @@ def make_paths(file_contexts: List[FileContext]) -> List[FileContext]:
     ]
 
 
-def write_files(file_contexts: List[FileContext], out_dir: str):
+def write_files(file_contexts: List[FileContext], out_dir: str, config: Dict):
     context_dicts = [asdict(context_item) for context_item in file_contexts]
     tags = [item for list_ in [context_item.meta.get("tags", []) for context_item in file_contexts] for item in list_]
+    references = {
+        context["meta"]["reference"]: context 
+        for context in context_dicts if context["meta"].get("reference", None)
+    }
     for context in file_contexts:
         uri_slash_filename = context.calculated_uri.lstrip('/')
         if not uri_slash_filename:
@@ -146,7 +162,14 @@ def write_files(file_contexts: List[FileContext], out_dir: str):
         out_path = os.path.join(out_dir, uri_slash_filename).rstrip('/')
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         with open(out_path, 'w') as f:
-            render = context.group.get_template(env).render(context=asdict(context), all=context_dicts, tags=tags)
+            render = context.group.get_template(env).render(
+                context=asdict(context), 
+                all=context_dicts, 
+                tags=tags, 
+                references=references,
+                config=config,
+            )
+            print("RENDER:", render)
             f.write(render)
 
 
@@ -195,8 +218,8 @@ def main(src_dir: str, out_dir: str, config_relpath: str, site_url: str, templat
     file_contexts = parse_directory(src_dir, ['md'])
     file_contexts = resolve_groups(file_contexts, config)
     file_contexts = make_paths(file_contexts)
-    print(json.dumps([asdict(context) for context in file_contexts], indent=2, default=str))
-    write_files(file_contexts, out_dir)
+    # print(json.dumps([asdict(context) for context in file_contexts], indent=2, default=str))
+    write_files(file_contexts, out_dir, config)
     generate_rss(file_contexts, out_dir, site_url)
 
 
